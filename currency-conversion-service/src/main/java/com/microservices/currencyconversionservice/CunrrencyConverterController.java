@@ -41,7 +41,7 @@ public class CunrrencyConverterController {
                 response.getFrom(),
                 response.getTo(),
                 response.getConversionMultiple(),
-                response.getQuantity(),
+                quantity,
                 quantity.multiply(response.getConversionMultiple()),
                 response.getPort());
     }
@@ -57,7 +57,7 @@ public class CunrrencyConverterController {
                 response.getFrom(),
                 response.getTo(),
                 response.getConversionMultiple(),
-                response.getQuantity(),
+                quantity,
                 quantity.multiply(response.getConversionMultiple()),
                 response.getPort());
     }
