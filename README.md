@@ -1,6 +1,5 @@
 # spring-microservices
-A few microservices, a Spring Cloud Config Service, a Spring Zuul Api Service, a Spring Eureka Naming Service 
-- are the supporting services; While Exchange, Conversion, and Limit Services are the attempt to communicate 
+A few microservices, a Spring Cloud Config Service, a Spring Zuul Api Service, a Spring Eureka Naming Service - are the supporting services; While Exchange, Conversion, and Limit Services are the attempt to communicate 
 and simulate a microservice environment
 
 
@@ -32,8 +31,8 @@ The pieces used:
 	- To utilize `RibbonClient`, we must do that on a Controller or Proxy, and in reference to the target service.
 4. We install RabbitMQ, Erlang, download `zipkin-server` jar file from the site.
 5. Limit Service, is connecting to Spring Cloud Config Server, to be able to demonstrate a central configuration server
- - It essentially sets a limit on some account - a minimum and maximum and it is getting those values from the Spring Cloud Config Server.
+	- It essentially sets a limit on some account - a minimum and maximum and it is getting those values from the Spring Cloud Config Server.
 6. Currency Exchange Service: is a api accessible service that will tell you the exchange rate of a few countries
-  - This api endpoint is registered, in the Currency Conversion Service, as a load balancing endpoint (via Ribbon). Nothing in the `CurrencyExchangeController` tells consumers it is a load balancing endpoint, it is actually the consumers that register this info.
-  - When it initially runs it creates the data it needs in a h2 database. You can access that database at the following url http://localhost:8000/h2-console
-7. Currency Conversion Service:   
+	- This api endpoint is registered, in the Currency Conversion Service, as a load balancing endpoint (via Ribbon). Nothing in the `CurrencyExchangeController` tells consumers it is a load balancing endpoint, it is actually the consumers that register this info.
+	- When it initially runs it creates the data it needs in a h2 database. You can access that database at the following url http://localhost:8000/h2-console
+7. Currency Conversion Service: `//@TOD	O:`
