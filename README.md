@@ -42,13 +42,33 @@ The pieces used:
 
 <hr />
 
+## Getting configs from Spring Cloud Config Server exercise:
+If we want to make it so that a particular MicroService uses the spring cloud config server as the central location for configs,
+we must do a few things and have 2 services running:
+1. Spring Cloud Config Server
+2. LimitsService
+
+In order to run demo we must start the apps in a certain order:
+1. Spring Cloud Config Server
+2. LimitsService
+
+Steps to get this to work:
+1. Create a local git repository in the Sprign Cloud Config Server, inside of the `git-localconfig-repo`
+2. After you create the local repo, you want to git add and commit the config files - this allows the Config Server to feed and read them
+3. Make sure Config Server's `application.properties` file is specifying where the git local repo is, in: `spring.cloud.config.server.git.uri`
+3. Start the Config Server
+4. Start the LimitService
+5. Visit the LimitService endpoint url: http://localhost:8081/limits
+
+You then can adjust what config we want - in the LimitService `bootstrap.properties` file, by adjusting what profile is active
+
 ## All requests are logged exercise:
 If we want to simulate a live environment, where we can track and trace one request
 and all of the services the request goes through, then centralize this information in a log, we 
 would need to run some of these services in a certain order.
 
-To be able to completely show the demonstration for running Spring Microservices that are aggregating logs into RabbitMQ, via Zipkin,
-then pulled out via Zuul, then we will need 5 services running (And the Zipkin Distrbuted Tracing Server):
+To be able to completely show the demonstration for running Spring Microservices that are aggregating logs into the RabbitMQ Queue. 
+Then have those logs pulled with Zipkin and shown and displayed in the Zipkin url.
 1. Conversion
 2. Exchange
 3. Eureka Naming Server
@@ -67,6 +87,10 @@ In order to run demo we must start the apps in a certain order:
 First thing we should do is check that the 3 services are registered with Eureka, by visiting: http://localhost:8761/
 Second thing we should do is check that Zipkin recognizes the 3 services, by visiting http://localhost:9411/zipkin/. keep in mind that Zipkin takes a bit before it recognizes all the services.
 Make a request to the Conversion service, then go to the Zipkin URL and you can click on the request and see all of the services it went through on every level. First Currency, then Zuul, then Exchange.
+
+
+
+
 
 
 
