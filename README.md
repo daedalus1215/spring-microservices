@@ -18,9 +18,9 @@ Spring Cloud (Netflix) Microservice Architecture.
 The pieces used:
 1. Spring Cloud Config Server: To have a central location for configs, for all the applications.
 	- On consuming Service, Register the config server url (via `application.properties`). You can choose a profile as well (which config file to choose depending on environment). Example of this is in the `limits-service`.
-	- On Server, we create the `git-localconfig-repo` directory and `git init` in it, to make it a local repo
-	- On Server, we register that `git-localconfig-repo` dir in the `application.properties`
-	- Create our configs (e.g. `limits-service.properties`, `limits-service-dev.properties`, etc) in that new directory (`git-localconfig-repo`); and then, `git commit` them.
+	- On Server, we create the `localconfig-repo` directory and `git init` in it, to make it a local repo
+	- On Server, we register that `localconfig-repo` dir in the `application.properties`
+	- Create our configs (e.g. `limits-service.properties`, `limits-service-dev.properties`, etc) in that new directory (`localconfig-repo`); and then, `git commit` them.
 	 - This is wierd, they do not store in repo well, because they belong to a local repo - which always needs to be local for the service.
 2. Netflix Eureka Naming Server: This will be the way we integrate our services together by registering their name.
 	- Create a Name for your Service in the application.properties (every new or existing service should do this). 
@@ -42,6 +42,7 @@ The pieces used:
 
 <hr />
 
+
 ## Getting configs from Spring Cloud Config Server exercise:
 If we want to make it so that a particular MicroService uses the spring cloud config server as the central location for configs,
 we must do a few things and have 2 services running:
@@ -53,14 +54,50 @@ In order to run demo we must start the apps in a certain order:
 2. LimitsService
 
 Steps to get this to work:
-1. Create a local git repository in the Sprign Cloud Config Server, inside of the `git-localconfig-repo`
-2. After you create the local repo, you want to git add and commit the config files - this allows the Config Server to feed and read them
+1. Create a local git repository in the Spring Cloud Config Server, inside of the `localconfig-repo`
+2. After you create the local repo, you want to, `git add` and `commit` the config files - this allows the Config Server to feed and read them
 3. Make sure Config Server's `application.properties` file is specifying where the git local repo is, in: `spring.cloud.config.server.git.uri`
 3. Start the Config Server
 4. Start the LimitService
 5. Visit the LimitService endpoint url: http://localhost:8081/limits
 
 You then can adjust what config we want - in the LimitService `bootstrap.properties` file, by adjusting what profile is active
+
+<hr />
+
+## Having multiple Service instances refresh their configs with spring cloud bus - over rabbitMQ, via amqp
+If we want to be able to tell multiple instances of LimitService to refresh their config retrieval from the Spring Cloud Config Server,
+we will need to run 2 services:
+1. Spring Cloud Config Server
+2. LimitService
+
+The magic happens with Spring Cloud Bus dependency in both the Config Server's POM file and the LimitService's POM file. 
+When the application starts up all instances of LimitService registers to the Spring Cloud Bus. When there is any change 
+in configuration, and then refresh is called on any of these instances, then the microservice instance sends an event 
+over to the cloud bus and the cloud bus will propagate that event to all the microservices registered to the bus.
+
+The thing about Spring Boot, as soon as we add the right dependencies, it is all configured for us. We have RabbitMQ 
+running in the background. Spring noticies that and sees there is a amqp dependency in the classpath, it will auto 
+connect to rabbitMQ.
+
+In order to run demo we must start the apps in a certain order:
+1. Spring Cloud Config Server
+2. LimitsService
+
+Steps to get this to work:
+1. Create a local git repository in the Spring Cloud Config Server, inside of the `localconfig-repo`
+2. After you create the local repo, you want to, `git add` and `commit` the config files - this allows the Config Server to feed and read them
+3. Make sure Config Server's `application.properties` file is specifying where the git local repo is, in: `spring.cloud.config.server.git.uri`
+3. Start the Config Server
+4. Start the LimitService
+5. Visit the LimitService endpoint url: http://localhost:8081/limits
+6. Change the config, if we are pointing at the `qa` profile in LimitService, then change that corresponding config in the Cloud Config Service's min, max values
+7. Make sure, in LimitService, we set the `bootstrap.properties` file's endpoint exposure to `bus-refresh` enabled: `management.endpoints.web.exposure.include=bus-refresh`
+8. Open Postman, make a POST request to LimitService's actuator's instance for bus-refresh: http://localhost:8080/actuator/bus-refresh
+9. Revisit all the LimitService instances and see that their output has changed - since they feed off of the Config Server, they get it's updated changes from step 6..
+
+<hr />
+
 
 ## All requests are logged exercise:
 If we want to simulate a live environment, where we can track and trace one request
