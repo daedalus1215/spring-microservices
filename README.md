@@ -42,6 +42,15 @@ The pieces used:
 
 <hr />
 
+## Using Netflix Histrix to add fault tolerance
+If we want to make sure that a particular Microservice implement fault tolerance 
+all we really need is 1 service running:
+1. LimitService
+
+We have an additional method in the Controller that will be deferred to when there is 
+an error that is thrown in the main Controller's request handling method.
+
+<hr />
 
 ## Using Eureka, Ribbon, & Feign we are able to distribute calls using Eureka:
 If we want to make it so that a particular MicroService has it's requests distrbuted to 
